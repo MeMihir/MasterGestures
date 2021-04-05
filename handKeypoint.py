@@ -45,4 +45,5 @@ def test(source=0, display=False):
     finally:
         cap.release()
 
-test(0, True)
+if __name__ == '__main__':
+    test(0, True)
