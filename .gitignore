@@ -2,6 +2,8 @@
 __pycache__/
 *.py[cod]
 *$py.class
+.vscode
+outputs
 
 # C extensions
 *.so
