@@ -2,8 +2,7 @@ import cv2
 import mediapipe as mp
 mp_drawing = mp.solutions.drawing_utils
 mp_hands = mp.solutions.hands
-hands = mp_hands.Hands(min_detection_confidence=0.5, min_tracking_confidence=0.5)
-hands_bounding_box = mp_hands.Hands(min_detection_confidence=0.5)
+hands = mp_hands.Hands(min_detection_confidence=0.4,  max_num_hands=1, min_tracking_confidence=0.4)
 
 def detectKeypoints(frame):
     # Flip the frame horizontally for a later selfie-view display, and convert
