@@ -2,16 +2,27 @@ import numpy as np
 import xgboost as xgb
 import pickle as pkl
 
-GestureMapping = ['RDoubleClick', 'RLeftClick', 'RPoint', 'RRightClick', 'Scroll', 'Rest']
-gestureClassifier = pkl.load(open('./models/gesture_classifier.pkl', 'rb'))
+# GestureMapping = ['RDoubleClick', 'RLeftClick', 'RPoint', 'RRightClick', 'Scroll', 'Rest']
+GestureMapping = ['RDClick', 'RLClick', 'RPoint', 'RRClick', 'RScroll']
+gestureClassifier = pkl.load(open('./models/gesture_classifier3.pkl', 'rb'))
 
 def preprocess_points(points):
     points = points.multi_hand_landmarks[0].landmark
     row = []
+    minx = miny = 2
+    maxx = maxy = 0.00001
+    
     for pt in points:
-        row.append(pt.x)
-        row.append(pt.y)
+        minx = min(minx, pt.x)
+        miny = min(miny, pt.y)
+        maxx = max(maxx, pt.x)
+        maxy = max(maxy, pt.y)
+
+    for pt in points:
+        row.append((pt.x - minx)/(maxx-minx))
+        row.append((pt.y - miny)/(maxy-miny))
         row.append(pt.z)
+
     row = np.expand_dims(np.array(row),0)
     return xgb.DMatrix(row)
 

@@ -7,10 +7,20 @@ from glob import glob
 def extractRow(points):
     points = points.multi_hand_landmarks[0].landmark
     row = []
+    minx = miny = 2
+    maxx = maxy = 0.00001
+
     for pt in points:
-        row.append(pt.x)
-        row.append(pt.y)
+        minx = min(minx, pt.x)
+        miny = min(miny, pt.y)
+        maxx = max(maxx, pt.x)
+        maxy = max(maxy, pt.y)
+
+    for pt in points:
+        row.append((pt.x - minx)/(maxx-minx))
+        row.append((pt.y - miny)/(maxy-miny))
         row.append(pt.z)
+
     return np.array(row)
 
 def DFHeaders():
