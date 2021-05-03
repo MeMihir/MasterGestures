@@ -1,11 +1,13 @@
 from numpy import BUFSIZE
+from numpy.core.fromnumeric import mean
 from pynput import mouse
 from pynput.mouse import Controller, Button
 from sys import platform
 import os
 from gestureClassifier import classifyGesture
 mouse = Controller()
-MODE = 'Point'
+MODE = 'RPoint'
+currBuff = []
 
 def get_screen_resolution():
     ''' OS independent way of getting screen resolution. Adapted from pyautogui. '''
@@ -46,7 +48,19 @@ def leftClick():
     global MODE
     if MODE!='LClick':
         mouse.press(Button.left)
-    MODE = 'LClick'
+        MODE = 'LClick'
+
+def rightClick():
+    global MODE
+    if MODE!='RClick':
+        mouse.click(Button.right, 1)
+        MODE = 'RClick'
+
+def doubleClick():
+    global MODE
+    if MODE!='RDClick':
+        mouse.click(Button.left, 2)
+        MODE = 'RDClick'
 
 def scroll():
     global MODE
@@ -55,17 +69,25 @@ def scroll():
     MODE = 'Scroll'
 
 def mouse_control(points):
-    global MODE
+    global MODE 
+    global currBuff
+    
     if points != None and points.multi_hand_landmarks != None:
         gesture = classifyGesture(points)
-        move_cursor(
-            points.multi_hand_landmarks[0].landmark[8].x, 
-            points.multi_hand_landmarks[0].landmark[8].y
-        )
-        print(gesture)
-        if gesture=='Rest' or gesture == 'Point':
+        if len(currBuff)==0:
+            currBuff = [[points.multi_hand_landmarks[0].landmark[8].x]*10,
+                [points.multi_hand_landmarks[0].landmark[8].y]*10]
+        else:
+            currBuff[0].pop(0)
+            currBuff[1].pop(0)
+            currBuff[0].append(points.multi_hand_landmarks[0].landmark[8].x)
+            currBuff[1].append(points.multi_hand_landmarks[0].landmark[8].y)
+
+        move_cursor(mean(currBuff[0]), mean(currBuff[1]))
+        # print(gesture, MODE)
+        if gesture=='Rest' or gesture == 'RPoint':
             rest()
-        elif gesture=='RRightClick':
+        elif gesture=='RLClick':
             leftClick()
         elif gesture=='Scroll':
             scroll()
